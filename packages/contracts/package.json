@@ -15,6 +15,7 @@
         "test": "run-s build run_mocha",
         "test:coverage": "SOLIDITY_COVERAGE=true run-s build run_mocha coverage:report:text coverage:report:lcov",
         "run_mocha": "mocha 'lib/test/**/*.js' --timeout 100000 --bail --exit",
+        "run_live": "mocha 'lib/test/test_live/**/*.js' --timeout 1000000 --bail --exit",
         "compile:comment":
             "Yarn workspaces do not link binaries correctly so we need to reference them directly https://github.com/yarnpkg/yarn/issues/3846",
         "compile":
@@ -30,9 +31,9 @@
     },
     "config": {
         "abis":
-            "../migrations/src/artifacts/@(DummyERC20Token|Exchange|TokenRegistry|MultiSigWallet|MultiSigWalletWithTimeLock|MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress|TokenRegistry|ZRXToken|TestAssetProxyDispatcher|ERC20Proxy|ERC721Proxy|DummyERC721Token|LibBytes|Authorizable).json",
+            "../migrations/src/artifacts/@(DummyERC20Token|Exchange|TokenRegistry|MultiSigWallet|MultiSigWalletWithTimeLock|MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress|TokenRegistry|ZRXToken|TestAssetProxyDispatcher|ERC20Proxy|ERC721Proxy|DummyERC721Token|LibBytes|Authorizable|WETH9).json",
         "contracts":
-            "Exchange,DummyERC20Token,ZRXToken,WETH9,MultiSigWallet,MultiSigWalletWithTimeLock,MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,TokenRegistry,TestAssetProxyDispatcher,ERC20Proxy,ERC721Proxy,DummyERC721Token,LibBytes,Authorizable"
+            "Exchange,DummyERC20Token,ZRXToken,WETH9,MultiSigWallet,MultiSigWalletWithTimeLock,MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,TokenRegistry,TestAssetProxyDispatcher,ERC20Proxy,ERC721Proxy,DummyERC721Token,LibBytes,Authorizable,WETH9"
     },
     "repository": {
         "type": "git",

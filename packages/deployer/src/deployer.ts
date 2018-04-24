@@ -89,6 +89,27 @@ export class Deployer {
         return contractInstance;
     }
     /**
+     * Loads a contract's corresponding artifacts and deploys it with the supplied constructor arguments
+     * unless it has already been deployed.
+     * @param contractName Name of the contract to deploy. Must match name of an artifact in artifacts directory.
+     * @return Network specific contract data.
+     */
+    public async deployUnlessDeployedAsync(contractName: string, args: any[] = []): Promise<Web3.ContractInstance> {
+        const contractArtifactIfExists: ContractArtifact = this._loadContractArtifactIfExists(contractName);
+        const contractNetworkDataIfExists: ContractNetworkData = this._getContractNetworkDataFromArtifactIfExists(
+            contractArtifactIfExists,
+        );
+        if (_.isUndefined(contractNetworkDataIfExists) || _.isUndefined(contractNetworkDataIfExists.address)) {
+            return this.deployAndSaveAsync(contractName, args);
+        } else {
+            logUtils.log(`${contractName}.sol already deployed at ${contractNetworkDataIfExists.address}`);
+            return {
+                address: contractNetworkDataIfExists.address,
+                abi: contractNetworkDataIfExists.abi,
+            };
+        }
+    }
+    /**
      * Loads a contract's artifact, deploys it with supplied constructor arguments, and saves the updated data
      * back to the artifact file.
      * @param contractName Name of the contract to deploy. Must match name of an artifact in artifacts directory.
@@ -99,6 +120,18 @@ export class Deployer {
         const contractInstance = await this.deployAsync(contractName, args);
         await this._saveContractDataToArtifactAsync(contractName, contractInstance.address, args);
         return contractInstance;
+    }
+    /**
+     * Loads a contract's artifact if it exists
+     * @param contractName Name of the contract to deploy. Must match name of an artifact in artifacts directory.
+     * @return Network specific contract data.
+     */
+    public getContractNetworkDataIfExists(contractName: string): ContractNetworkData {
+        const contractArtifactIfExists: ContractArtifact = this._loadContractArtifactIfExists(contractName);
+        const contractNetworkDataIfExists: ContractNetworkData = this._getContractNetworkDataFromArtifactIfExists(
+            contractArtifactIfExists,
+        );
+        return contractNetworkDataIfExists;
     }
     /**
      * Deploys a contract given its ABI, arguments, and transaction data.
@@ -114,7 +147,7 @@ export class Deployer {
              * Contract is inferred as 'any' because TypeScript
              * is not able to read 'new' from the Contract interface
              */
-            (contract as any).new(...args, txData, (err: Error, res: any): any => {
+            (contract as any).new(...args, txData, async (err: Error, res: any): Promise<any> => {
                 if (err) {
                     reject(err);
                 } else if (_.isUndefined(res.address) && !_.isUndefined(res.transactionHash)) {
@@ -157,6 +190,7 @@ export class Deployer {
         };
         const artifactString = utils.stringifyWithFormatting(newArtifact);
         const artifactPath = `${this._artifactsDir}/${contractName}.json`;
+        logUtils.log(`${contractName} saved to ${artifactPath}`);
         await fsWrapper.writeFileAsync(artifactPath, artifactString);
     }
     /**

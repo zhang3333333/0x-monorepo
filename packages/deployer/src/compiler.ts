@@ -109,7 +109,9 @@ export class Compiler {
             shouldCompile = true;
         } else {
             const currentArtifact = currentArtifactIfExists as ContractArtifact;
+            shouldCompile = _.isUndefined(currentArtifact.networks[this._networkId]);
             shouldCompile =
+                shouldCompile ||
                 currentArtifact.networks[this._networkId].optimizer_enabled !== this._optimizerEnabled ||
                 currentArtifact.networks[this._networkId].source_tree_hash !== sourceTreeHashHex;
         }
