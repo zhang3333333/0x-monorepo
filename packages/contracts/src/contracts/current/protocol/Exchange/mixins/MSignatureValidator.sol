@@ -27,12 +27,13 @@ contract MSignatureValidator is
     enum SignatureType {
         Illegal,  // Default value
         Invalid,
-        Caller,
-        Ecrecover,
         EIP712,
-        Trezor,
+        Ecrecover,
+        TxOrigin,
+        Caller,
         Contract,
-        PreSigned
+        PreSigned,
+        Trezor
     }
 
     /// @dev Verifies that a signature is valid.
