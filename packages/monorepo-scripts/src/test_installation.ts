@@ -19,17 +19,30 @@ import { utils } from './utils';
             !_.isUndefined(lernaPackage.package.main) &&
             lernaPackage.package.main.endsWith('.js'),
     );
+    const packedPackagePathByName: { [packageName: string]: string } = {};
+    for (const installableLernaPackage of installablePackages) {
+        const packagePath = installableLernaPackage.location;
+        const packageName = installableLernaPackage.package.name;
+        utils.log(`Packing ${packageName}`);
+        const result = await execAsync('npm pack', { cwd: packagePath });
+        const packedPackageFileName = result.stdout.trim();
+        packedPackagePathByName[packageName] = path.join(packagePath, packedPackageFileName);
+    }
+    const resolutions = _.mapValues(packedPackagePathByName, val => `file:${val}`);
     for (const installableLernaPackage of installablePackages) {
         const packagePath = installableLernaPackage.location;
         const packageName = installableLernaPackage.package.name;
         utils.log(`Testing ${packageName}`);
-        let result = await execAsync('npm pack', { cwd: packagePath });
-        const packedPackageFileName = result.stdout.trim();
         const testDirectory = path.join(monorepoRootPath, '../test-env');
         fs.mkdirSync(testDirectory);
-        result = await execAsync('yarn init --yes', { cwd: testDirectory });
-        utils.log(`Installing ${packedPackageFileName}`);
-        result = await execAsync(`yarn add ${packagePath}/${packedPackageFileName}`, { cwd: testDirectory });
+        const result = await execAsync('yarn init --yes', { cwd: testDirectory });
+        const packedPackagePath = packedPackagePathByName[packageName];
+        utils.log(`Installing ${path.basename(packedPackagePath)}`);
+        await execAsync(`yarn add ${packedPackagePath}`, { cwd: testDirectory });
+        const packageJSONFilePath = path.join(testDirectory, 'package.json');
+        let packageJSONContent = JSON.parse(fs.readFileSync(packageJSONFilePath).toString());
+        packageJSONContent = { ...packageJSONContent, resolutions };
+        fs.writeFileSync(packageJSONFilePath, JSON.stringify(packageJSONContent));
         const indexFilePath = path.join(testDirectory, 'index.ts');
         fs.writeFileSync(indexFilePath, `import * as Package from '${packageName}';\n`);
         const tsConfig = {
