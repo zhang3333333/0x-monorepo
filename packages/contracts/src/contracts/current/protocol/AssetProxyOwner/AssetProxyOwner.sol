@@ -18,9 +18,9 @@
 
 pragma solidity ^0.4.10;
 
-import "../MultiSigWalletWithTimeLock/MultiSigWalletWithTimeLock.sol";
+import "../../multisig/MultiSigWalletWithTimeLock/MultiSigWalletWithTimeLock.sol";
 
-contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is
+contract AssetProxyOwner is
     MultiSigWalletWithTimeLock
 {
 
@@ -44,7 +44,7 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is
     /// @param _required Number of required confirmations.
     /// @param _secondsTimeLocked Duration needed after a transaction is confirmed and before it becomes executable, in seconds.
     /// @param _assetProxyContracts Array of AssetProxy contract addresses.
-    function MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress(
+    function AssetProxyOwner(
         address[] memory _owners,
         uint256 _required,
         uint256 _secondsTimeLocked,
@@ -102,6 +102,9 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is
         return true;
     }
 
+    /// @dev Reads the first 4 bytes from a byte array of arbitrary length.
+    /// @param data Byte array to read first 4 bytes from.
+    /// @return First 4 bytes of data.
     function readFirst4(bytes memory data)
         public
         pure
