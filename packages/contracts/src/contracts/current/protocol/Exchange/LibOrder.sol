@@ -22,19 +22,21 @@ pragma experimental ABIEncoderV2;
 contract LibOrder {
 
     bytes32 constant ORDER_SCHEMA_HASH = keccak256(
-        "address exchangeAddress",
-        "address makerAddress",
-        "address takerAddress",
-        "address feeRecipientAddress",
-        "address senderAddress",
-        "uint256 makerAssetAmount",
-        "uint256 takerAssetAmount",
-        "uint256 makerFee",
-        "uint256 takerFee",
-        "uint256 expirationTimeSeconds",
-        "uint256 salt",
-        "bytes makerAssetData",
-        "bytes takerAssetData"
+        "Order(",
+        "address exchangeAddress,",
+        "address makerAddress,",
+        "address takerAddress,",
+        "address feeRecipientAddress,",
+        "address senderAddress,",
+        "uint256 makerAssetAmount,",
+        "uint256 takerAssetAmount,",
+        "uint256 makerFee,",
+        "uint256 takerFee,",
+        "uint256 expirationTimeSeconds,",
+        "uint256 salt,",
+        "bytes makerAssetData,",
+        "bytes takerAssetData,",
+        ")"
     );
 
     struct Order {
@@ -76,8 +78,8 @@ contract LibOrder {
                 order.takerFee,
                 order.expirationTimeSeconds,
                 order.salt,
-                order.makerAssetData,
-                order.takerAssetData
+                keccak256(order.makerAssetData),
+                keccak256(order.takerAssetData)
             )
         );
         return orderHash;
