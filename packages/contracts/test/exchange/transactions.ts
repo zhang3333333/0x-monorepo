@@ -230,7 +230,10 @@ describe('Exchange transactions', () => {
             erc20Balances = await erc20Wrapper.getBalancesAsync();
         });
 
-        it('should revert if taker has not been whitelisted', async () => {
+        it('should revert if maker has not been whitelisted', async () => {
+            const isApproved = true;
+            await whitelist.updateWhitelistStatus.sendTransactionAsync(takerAddress, isApproved, { from: owner });
+
             const orderStruct = orderUtils.getOrderStruct(signedOrder);
             const takerAssetFillAmount = signedOrder.takerAssetAmount;
             const salt = ZeroEx.generatePseudoRandomSalt();
@@ -245,8 +248,27 @@ describe('Exchange transactions', () => {
             ).to.be.rejectedWith(constants.REVERT);
         });
 
-        it('should fill the order if taker has been whitelisted', async () => {
+        it('should revert if taker has not been whitelisted', async () => {
             const isApproved = true;
+            await whitelist.updateWhitelistStatus.sendTransactionAsync(makerAddress, isApproved, { from: owner });
+
+            const orderStruct = orderUtils.getOrderStruct(signedOrder);
+            const takerAssetFillAmount = signedOrder.takerAssetAmount;
+            const salt = ZeroEx.generatePseudoRandomSalt();
+            return expect(
+                whitelist.fillOrderIfWhitelisted.sendTransactionAsync(
+                    orderStruct,
+                    takerAssetFillAmount,
+                    salt,
+                    signedOrder.signature,
+                    { from: takerAddress },
+                ),
+            ).to.be.rejectedWith(constants.REVERT);
+        });
+
+        it('should fill the order if maker and taker have been whitelisted', async () => {
+            const isApproved = true;
+            await whitelist.updateWhitelistStatus.sendTransactionAsync(makerAddress, isApproved, { from: owner });
             await whitelist.updateWhitelistStatus.sendTransactionAsync(takerAddress, isApproved, { from: owner });
 
             const orderStruct = orderUtils.getOrderStruct(signedOrder);
@@ -259,7 +281,6 @@ describe('Exchange transactions', () => {
                 signedOrder.signature,
                 { from: takerAddress },
             );
-
             const newBalances = await erc20Wrapper.getBalancesAsync();
 
             const makerAssetFillAmount = signedOrder.makerAssetAmount;

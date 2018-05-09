@@ -15,7 +15,7 @@
   limitations under the License.
 
 */
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import "./mixins/MSignatureValidator.sol";
 import "./mixins/MTransactions.sol";
@@ -47,7 +47,10 @@ contract MixinTransactions is
         external
     {
         // Prevent reentrancy
-        require(currentContextAddress == address(0));
+        require(
+            currentContextAddress == address(0),
+            REENTRANCY_NOT_ALLOWED
+        );
 
         // Calculate transaction hash
         bytes32 transactionHash = keccak256(
