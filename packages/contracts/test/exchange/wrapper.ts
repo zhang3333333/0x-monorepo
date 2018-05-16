@@ -24,6 +24,7 @@ import { BalancesByOwner, ContractName } from '../../util/types';
 import { chaiSetup } from '../utils/chai_setup';
 
 import { provider, txDefaults, web3Wrapper } from '../utils/web3_wrapper';
+import { expectRevertOrAlwaysFailingTransaction } from '../utils/assertions';
 
 chaiSetup.configure();
 const expect = chai.expect;
@@ -185,15 +186,15 @@ describe('Exchange', () => {
             );
         });
 
-        it.skip('should throw if an signedOrder is expired', async () => {
+        it('should throw if an signedOrder is expired', async () => {
             const signedOrder = await orderFactory.newSignedOrderAsync({
                 expirationUnixTimestampSec: new BigNumber(Math.floor((Date.now() - 10000) / 1000)),
             });
 
-            return expect(exWrapper.fillOrKillOrderAsync(signedOrder, taker)).to.be.rejectedWith(constants.REVERT);
+            return expectRevertOrAlwaysFailingTransaction(exWrapper.fillOrKillOrderAsync(signedOrder, taker));
         });
 
-        it.skip('should throw if entire fillTakerTokenAmount not filled', async () => {
+        it('should throw if entire fillTakerTokenAmount not filled', async () => {
             const signedOrder = await orderFactory.newSignedOrderAsync();
 
             const from = taker;
@@ -201,7 +202,7 @@ describe('Exchange', () => {
                 fillTakerTokenAmount: signedOrder.takerTokenAmount.div(2),
             });
 
-            return expect(exWrapper.fillOrKillOrderAsync(signedOrder, taker)).to.be.rejectedWith(constants.REVERT);
+            return expectRevertOrAlwaysFailingTransaction(exWrapper.fillOrKillOrderAsync(signedOrder, taker));
         });
     });
 
@@ -289,7 +290,7 @@ describe('Exchange', () => {
                 expect(newBalances).to.be.deep.equal(balances);
             });
 
-            it.skip('should throw if a single signedOrder does not fill the expected amount', async () => {
+            it('should throw if a single signedOrder does not fill the expected amount', async () => {
                 const fillTakerTokenAmounts: BigNumber[] = [];
                 signedOrders.forEach(signedOrder => {
                     const fillTakerTokenAmount = signedOrder.takerTokenAmount.div(2);
@@ -298,11 +299,11 @@ describe('Exchange', () => {
 
                 await exWrapper.fillOrKillOrderAsync(signedOrders[0], taker);
 
-                return expect(
+                return expectRevertOrAlwaysFailingTransaction(
                     exWrapper.batchFillOrKillOrdersAsync(signedOrders, taker, {
                         fillTakerTokenAmounts,
                     }),
-                ).to.be.rejectedWith(constants.REVERT);
+                );
             });
         });
 
@@ -374,18 +375,18 @@ describe('Exchange', () => {
                 expect(newBalances).to.be.deep.equal(balances);
             });
 
-            it.skip('should throw when an signedOrder does not use the same takerTokenAddress', async () => {
+            it('should throw when an signedOrder does not use the same takerTokenAddress', async () => {
                 signedOrders = await Promise.all([
                     orderFactory.newSignedOrderAsync(),
                     orderFactory.newSignedOrderAsync({ takerTokenAddress: zrx.address }),
                     orderFactory.newSignedOrderAsync(),
                 ]);
 
-                return expect(
+                return expectRevertOrAlwaysFailingTransaction(
                     exWrapper.fillOrdersUpToAsync(signedOrders, taker, {
                         fillTakerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(1000), 18),
                     }),
-                ).to.be.rejectedWith(constants.REVERT);
+                );
             });
         });
 
