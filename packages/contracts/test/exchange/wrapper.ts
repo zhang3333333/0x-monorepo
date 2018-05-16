@@ -185,7 +185,7 @@ describe('Exchange', () => {
             );
         });
 
-        it('should throw if an signedOrder is expired', async () => {
+        it.skip('should throw if an signedOrder is expired', async () => {
             const signedOrder = await orderFactory.newSignedOrderAsync({
                 expirationUnixTimestampSec: new BigNumber(Math.floor((Date.now() - 10000) / 1000)),
             });
@@ -193,7 +193,7 @@ describe('Exchange', () => {
             return expect(exWrapper.fillOrKillOrderAsync(signedOrder, taker)).to.be.rejectedWith(constants.REVERT);
         });
 
-        it('should throw if entire fillTakerTokenAmount not filled', async () => {
+        it.skip('should throw if entire fillTakerTokenAmount not filled', async () => {
             const signedOrder = await orderFactory.newSignedOrderAsync();
 
             const from = taker;
@@ -289,7 +289,7 @@ describe('Exchange', () => {
                 expect(newBalances).to.be.deep.equal(balances);
             });
 
-            it('should throw if a single signedOrder does not fill the expected amount', async () => {
+            it.skip('should throw if a single signedOrder does not fill the expected amount', async () => {
                 const fillTakerTokenAmounts: BigNumber[] = [];
                 signedOrders.forEach(signedOrder => {
                     const fillTakerTokenAmount = signedOrder.takerTokenAmount.div(2);
@@ -374,7 +374,7 @@ describe('Exchange', () => {
                 expect(newBalances).to.be.deep.equal(balances);
             });
 
-            it('should throw when an signedOrder does not use the same takerTokenAddress', async () => {
+            it.skip('should throw when an signedOrder does not use the same takerTokenAddress', async () => {
                 signedOrders = await Promise.all([
                     orderFactory.newSignedOrderAsync(),
                     orderFactory.newSignedOrderAsync({ takerTokenAddress: zrx.address }),

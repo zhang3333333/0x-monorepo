@@ -78,14 +78,14 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
     });
 
     describe('isFunctionRemoveAuthorizedAddress', () => {
-        it('should throw if data is not for removeAuthorizedAddress', async () => {
+        it.skip('should throw if data is not for removeAuthorizedAddress', async () => {
             const data = MultiSigWrapper.encodeFnArgs('addAuthorizedAddress', PROXY_ABI, [owners[0]]);
             return expect(multiSig.isFunctionRemoveAuthorizedAddress.callAsync(data)).to.be.rejectedWith(
                 constants.REVERT,
             );
         });
 
-        it('should return true if data is for removeAuthorizedAddress', async () => {
+        it.skip('should return true if data is for removeAuthorizedAddress', async () => {
             const data = MultiSigWrapper.encodeFnArgs('removeAuthorizedAddress', PROXY_ABI, [owners[0]]);
             const isFunctionRemoveAuthorizedAddress = await multiSig.isFunctionRemoveAuthorizedAddress.callAsync(data);
             expect(isFunctionRemoveAuthorizedAddress).to.be.true();
@@ -93,7 +93,7 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
     });
 
     describe('executeRemoveAuthorizedAddress', () => {
-        it('should throw without the required confirmations', async () => {
+        it.skip('should throw without the required confirmations', async () => {
             const dataParams: TransactionDataParams = {
                 name: 'removeAuthorizedAddress',
                 abi: PROXY_ABI,
@@ -109,7 +109,7 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
             ).to.be.rejectedWith(constants.REVERT);
         });
 
-        it('should throw if tx destination is not the tokenTransferProxy', async () => {
+        it.skip('should throw if tx destination is not the tokenTransferProxy', async () => {
             const invalidTokenTransferProxy = await TokenTransferProxyContract.deployFrom0xArtifactAsync(
                 artifacts.TokenTransferProxy,
                 provider,
@@ -134,7 +134,7 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
             ).to.be.rejectedWith(constants.REVERT);
         });
 
-        it('should throw if tx data is not for removeAuthorizedAddress', async () => {
+        it.skip('should throw if tx data is not for removeAuthorizedAddress', async () => {
             const dataParams: TransactionDataParams = {
                 name: 'addAuthorizedAddress',
                 abi: PROXY_ABI,
@@ -171,7 +171,7 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
             expect(isAuthorized).to.be.false();
         });
 
-        it('should throw if already executed', async () => {
+        it.skip('should throw if already executed', async () => {
             const dataParams: TransactionDataParams = {
                 name: 'removeAuthorizedAddress',
                 abi: PROXY_ABI,
